@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Lab Peluang — Simulasi Slot Lokal</title>
+<style>
+:root{--bg:#0a0b14;--panel:#15172a;--panel2:#1d2038;--text:#f4f5ff;--muted:#a7acc9;--purple:#a78bfa;--pink:#f472b6;--green:#6ee7b7;--red:#fda4af;--gold:#fcd34d;--border:#ffffff17}
+*{box-sizing:border-box}body{margin:0;background:radial-gradient(ellipse at top,#29204a 0,var(--bg) 55%);color:var(--text);font:15px/1.5 system-ui,-apple-system,Segoe UI,sans-serif}
+.wrap{max-width:1100px;width:calc(100% - 28px);margin:auto;padding:26px 0 40px}
+header{display:flex;align-items:center;justify-content:space-between;gap:14px;margin-bottom:20px}.brand{display:flex;gap:12px;align-items:center}.logo{width:48px;height:48px;display:grid;place-items:center;border-radius:15px;background:linear-gradient(135deg,var(--purple),var(--pink));font-size:25px}
+h1{font-size:clamp(23px,4vw,32px);margin:0;letter-spacing:-.7px}h2{font-size:17px;margin:0}h3{font-size:14px;margin:0}.sub,.muted{color:var(--muted);font-size:12px}.sub{margin-top:3px}.tag{font-size:11px;font-weight:800;color:var(--green);background:#6ee7b711;border:1px solid #6ee7b744;border-radius:99px;padding:7px 10px;white-space:nowrap}
+.notice{padding:13px 15px;border-radius:13px;background:#fcd34d0c;border:1px solid #fcd34d44;color:#f8e6ad;font-size:13px;margin-bottom:17px}
+.layout{display:grid;grid-template-columns:minmax(0,1.2fr) minmax(290px,.8fr);gap:17px;align-items:start}.panel{background:linear-gradient(180deg,#191b30,#121421);border:1px solid var(--border);border-radius:19px;padding:19px;box-shadow:0 15px 45px #0002}.head{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:15px}.eyebrow{text-transform:uppercase;letter-spacing:1.1px;font-size:10px;color:var(--muted);margin-bottom:3px}
+.balance{text-align:center;padding:17px;border-radius:15px;border:1px solid #a78bfa55;background:radial-gradient(ellipse at top,#392957,#1a1930 75%);margin-bottom:14px}.amount{font-size:clamp(34px,7vw,46px);font-weight:900;letter-spacing:-1px}.coin{color:var(--gold)}.machine{padding:15px;border-radius:16px;background:linear-gradient(135deg,#2b1a43,#17182c);border:1px solid #a78bfa55}
+.reels{display:grid;grid-template-columns:repeat(3,1fr);gap:9px}.reel{height:105px;border-radius:12px;display:grid;place-items:center;background:linear-gradient(#fff,#dcd8f0);color:#19152b;font-size:clamp(39px,8vw,58px);box-shadow:inset 0 -5px #bcb2dc}.reel.rolling{animation:shake .11s linear infinite}@keyframes shake{50%{transform:translateY(3px)}}
+.result{text-align:center;min-height:43px;padding:12px 3px 0;font-size:13px;color:var(--muted)}.result.good{color:var(--green);font-weight:800}.result.bad{color:var(--red)}
+.controls{display:grid;grid-template-columns:1fr auto;gap:10px;margin-top:12px}.field{padding:10px 12px;border-radius:11px;background:#0c0d18;border:1px solid var(--border)}label{display:block;color:var(--muted);font-size:11px;margin-bottom:5px}select,input{width:100%;background:#101120;color:var(--text);border:1px solid var(--border);border-radius:9px;padding:10px;font:inherit;outline:none}select option{background:#17182b}
+button{font:inherit;font-weight:800;border:0;border-radius:11px;padding:11px 14px;cursor:pointer;transition:transform .12s,opacity .12s}button:hover:not(:disabled){transform:translateY(-1px)}button:disabled{opacity:.45;cursor:not-allowed}.spin{min-width:120px;color:#20132b;background:linear-gradient(135deg,#fcd34d,#fb923c)}.secondary{color:var(--muted);background:#ffffff09;border:1px solid var(--border);font-size:12px;padding:8px 11px}.smallbtn{padding:9px 12px;font-size:12px}
+.stats{display:grid;grid-template-columns:1fr 1fr;gap:9px}.stat{background:var(--panel2);border:1px solid var(--border);padding:13px;border-radius:13px}.stat .label{font-size:11px;color:var(--muted)}.stat .value{font-size:23px;font-weight:850;margin-top:4px}.stat .hint{font-size:10px;color:var(--muted)}
+.section-title{display:flex;justify-content:space-between;align-items:center;gap:10px;margin:20px 0 10px}.mode-box{border:1px solid var(--border);border-radius:13px;padding:13px;background:#ffffff04;margin-bottom:12px}.mode-options{display:grid;grid-template-columns:repeat(3,1fr);gap:7px;margin-top:9px}.mode-option{position:relative}.mode-option input{position:absolute;opacity:0;pointer-events:none}.mode-option span{display:grid;place-items:center;text-align:center;min-height:45px;padding:8px 4px;border:1px solid var(--border);border-radius:10px;background:#ffffff05;font-size:12px;font-weight:750;cursor:pointer}.mode-option input:checked+span{border-color:var(--purple);background:#a78bfa20;color:#d9ccff;box-shadow:inset 0 0 0 1px #a78bfa33}
+.mode-description{font-size:12px;color:var(--muted);margin:9px 0 0;line-height:1.55}.admin-grid{display:grid;grid-template-columns:1fr 1fr;gap:9px}.admin-grid button{align-self:end}.status{padding:10px 12px;background:#a78bfa10;border:1px solid #a78bfa33;border-radius:10px;font-size:12px;color:#d6caff;margin-top:10px}
+.history{display:flex;flex-direction:column;gap:7px;max-height:245px;overflow:auto}.history-row{display:grid;grid-template-columns:1fr auto auto;gap:8px;align-items:center;padding:10px;background:#ffffff05;border-radius:10px;font-size:12px}.symbols{font-size:18px;letter-spacing:2px}.pill{font-size:10px;font-weight:850;padding:4px 7px;border-radius:99px}.win{background:#6ee7b718;color:var(--green)}.loss{background:#fda4af18;color:var(--red)}.empty{text-align:center;color:var(--muted);font-size:12px;padding:20px 6px}
+.lesson{padding:12px;border:1px solid var(--border);background:#ffffff05;border-radius:12px;margin-top:9px}.lesson p{margin:5px 0 0;color:var(--muted);font-size:12px;line-height:1.6}.footer{text-align:center;color:#8589a8;font-size:11px;margin-top:20px;line-height:1.7}
+@media(max-width:760px){.layout{grid-template-columns:1fr}.panel{padding:15px}.reel{height:90px}header{align-items:flex-start}}
+@media(max-width:390px){.tag{font-size:9px;padding:6px}.controls{grid-template-columns:1fr}.spin{width:100%}.mode-options{gap:5px}.mode-option span{font-size:11px}}
+</style>
+</head>
+<body>
+<main class="wrap">
+<header><div class="brand"><div class="logo">🎰</div><div><h1>Lab Peluang</h1><div class="sub">Simulasi slot edukasi · kontrol lokal realtime</div></div></div><span class="tag">● DEMO VIRTUAL</span></header>
+<div class="notice"><strong>Mode edukasi lokal.</strong> Semua kredit fiktif. Mode hasil di bawah hanya mengubah simulasi pada halaman ini; tidak terhubung ke pemain, layanan, atau transaksi sungguhan.</div>
+<div class="layout">
+<section class="panel">
+<div class="head"><div><div class="eyebrow">Mesin simulasi</div><h2>Slot virtual</h2></div><button class="secondary" id="reset">↻ Reset</button></div>
+<div class="balance"><div class="sub">SALDO VIRTUAL</div><div class="amount"><span class="coin">◉</span> <span id="balance">1.000</span></div><div class="sub">kredit fiktif · tidak bisa diuangkan</div></div>
+<div class="machine"><div class="reels"><div class="reel" id="r0">🍒</div><div class="reel" id="r1">🍋</div><div class="reel" id="r2">⭐</div></div><div class="result" id="result" aria-live="polite">Pilih mode hasil, lalu tekan SPIN.</div></div>
+<div class="controls"><div class="field"><label for="bet">KREDIT PER PUTARAN</label><select id="bet"><option value="10">10 kredit</option><option value="25" selected>25 kredit</option><option value="50">50 kredit</option><option value="100">100 kredit</option></select></div><button class="spin" id="spin">▶ SPIN</button></div>
+<div class="section-title"><h2>Riwayat hasil</h2><span class="eyebrow" id="historyCount">0 putaran</span></div><div class="history" id="history"><div class="empty">Riwayat akan muncul setelah spin pertama.</div></div>
+</section>
+<aside class="panel">
+<div class="head"><div><div class="eyebrow">Panel kontrol demo</div><h2>Atur hasil realtime</h2></div></div>
+<div class="mode-box"><h3>Mode hasil spin berikutnya</h3>
+<div class="mode-options">
+<label class="mode-option"><input type="radio" name="mode" value="random" checked><span>🎲 Acak</span></label>
+<label class="mode-option"><input type="radio" name="mode" value="win"><span>🟢 Menang</span></label>
+<label class="mode-option"><input type="radio" name="mode" value="lose"><span>🔴 Kalah</span></label>
+</div>
+<p class="mode-description" id="modeDescription">Hasil ditentukan secara acak oleh simulasi.</p>
+<div class="status" id="modeStatus">Mode aktif: ACAK · berlaku pada spin berikutnya.</div>
+</div>
+<div class="mode-box"><h3>Atur saldo demo</h3><p class="mode-description">Mengubah saldo virtual lokal saja, tidak mengubah riwayat yang sudah tercatat.</p>
+<div class="admin-grid" style="margin-top:10px"><div><label for="newBalance">Saldo baru (0–1.000.000)</label><input id="newBalance" type="number" min="0" max="1000000" step="100" value="1000"></div><button class="secondary smallbtn" id="setBalance">Terapkan saldo</button></div>
+</div>
+<div class="section-title"><h2>Statistik sesi</h2></div>
+<div class="stats">
+<div class="stat"><div class="label">Total spin</div><div class="value" id="spins">0</div><div class="hint">putaran</div></div>
+<div class="stat"><div class="label">Spin menang</div><div class="value" id="wins">0</div><div class="hint" id="winRate">0% dari putaran</div></div>
+<div class="stat"><div class="label">Kredit digunakan</div><div class="value" id="spent">0</div><div class="hint">total biaya spin</div></div>
+<div class="stat"><div class="label">Kredit hadiah</div><div class="value" id="returned">0</div><div class="hint">total payout demo</div></div>
+</div>
+<div class="section-title"><h2>Catatan edukasi</h2></div>
+<div class="lesson"><h3>🎲 Hasil sebelumnya bukan ramalan</h3><p>Dalam mode acak, hasil tiap spin tidak dipengaruhi oleh hasil sebelumnya. Rentetan kalah tidak menjamin kemenangan akan datang.</p></div>
+<div class="lesson"><h3>📊 Rasio menang bukan profit</h3><p>Rasio kemenangan hanya menghitung seberapa sering hadiah muncul. Bandingkan kredit yang digunakan dengan hadiah yang kembali untuk memahami hasil bersih.</p></div>
+<div class="lesson"><h3>🧠 Jangan mengejar kerugian</h3><p>Menaikkan taruhan demi balik modal dapat memperbesar kerugian. Dalam kehidupan nyata, berhenti dan mencari bantuan adalah pilihan yang sehat.</p></div>
+</aside>
+</div>
+<div class="footer">LAB PELUANG · Simulasi edukasi dengan kredit virtual<br>Mode menang/kalah adalah kontrol demonstrasi lokal, bukan prediksi hasil judi nyata.</div>
+</main>
+<script>
+const SYMBOLS = ["🍒","🍋","🍇","🔔","⭐","💎"];
+const START_BALANCE = 1000;
+let balance = START_BALANCE, spins = 0, wins = 0, spent = 0, returned = 0, busy = false;
+const history = [];
+const $ = id => document.getElementById(id);
+const fmt = n => Math.round(n).toLocaleString("id-ID");
+const currentMode = () => document.querySelector('input[name="mode"]:checked').value;
+const descriptions = {
+  random: "Hasil dipilih secara acak. Ini mode dasar untuk mengamati variasi hasil.",
+  win: "Spin berikutnya akan menampilkan tiga simbol sama dan hadiah demo 5× kredit spin. Label mode khusus dicatat di riwayat.",
+  lose: "Spin berikutnya akan menampilkan tiga simbol berbeda tanpa hadiah. Label mode khusus dicatat di riwayat."
+};
+function pick(){ return SYMBOLS[Math.floor(Math.random()*SYMBOLS.length)]; }
+function evaluate(reels, bet, mode){
+  if(mode === "win") return {payout:bet*5, win:true, label:"MENANG DEMO"};
+  if(mode === "lose") return {payout:0, win:false, label:"KALAH DEMO"};
+  if(reels[0]===reels[1] && reels[1]===reels[2]) return {payout:bet*5,win:true,label:"MENANG ACAK"};
+  if(reels[0]===reels[1] || reels[1]===reels[2] || reels[0]===reels[2]) return {payout:Math.floor(bet*1.5),win:true,label:"MENANG ACAK"};
+  return {payout:0,win:false,label:"KALAH ACAK"};
+}
+function updateMode(){
+  const mode=currentMode();
+  $("modeDescription").textContent=descriptions[mode];
+  $("modeStatus").textContent="Mode aktif: "+({random:"ACAK",win:"SELALU MENANG (DEMO)",lose:"SELALU KALAH (DEMO)"}[mode])+" · berlaku pada spin berikutnya.";
+}
+function update(){
+  $("balance").textContent=fmt(balance); $("spins").textContent=fmt(spins);
+  $("wins").textContent=fmt(wins); $("spent").textContent=fmt(spent); $("returned").textContent=fmt(returned);
+  $("winRate").textContent=(spins?wins/spins*100:0).toFixed(1).replace(".",",")+"% dari putaran";
+  $("spin").disabled=busy || balance<Number($("bet").value);
+  $("spin").textContent=balance<Number($("bet").value)?"KREDIT HABIS":busy?"MEMUTAR…":"▶ SPIN";
+  $("historyCount").textContent=history.length+" putaran";
+}
+function renderHistory(){
+  const root=$("history");
+  if(!history.length){root.innerHTML='<div class="empty">Riwayat akan muncul setelah spin pertama.</div>';return;}
+  root.innerHTML=history.map(x=>`<div class="history-row"><span><span class="symbols">${x.reels.join(" ")}</span><br><span class="muted">#${x.id} · ${x.modeName}</span></span><span class="pill ${x.win?"win":"loss"}">${x.win?"MENANG":"KALAH"}</span><strong>${x.payout>0?"+"+fmt(x.payout):"−"+fmt(x.bet)}</strong></div>`).join("");
+}
+function spin(){
+  if(busy)return;
+  const bet=Number($("bet").value);
+  if(balance<bet){$("result").textContent="Saldo demo tidak cukup. Atur saldo atau reset simulasi.";$("result").className="result bad";return;}
+  // Mode dibaca saat tombol ditekan, sehingga pengaturan berlaku pada spin berikutnya.
+  const mode=currentMode();
+  busy=true; balance-=bet; spent+=bet;
+  $("result").textContent="Memutar…"; $("result").className="result"; update();
+  document.querySelectorAll(".reel").forEach(el=>el.classList.add("rolling"));
+  let tick=0;
+  const timer=setInterval(()=>{
+    document.querySelectorAll(".reel").forEach(el=>el.textContent=pick());
+    if(++tick>=8){
+      clearInterval(timer);
+      let reels;
+      if(mode==="win"){const s=pick();reels=[s,s,s];}
+      else if(mode==="lose"){reels=[SYMBOLS[0],SYMBOLS[1],SYMBOLS[2]];}
+      else reels=[pick(),pick(),pick()];
+      reels.forEach((s,i)=>$("r"+i).textContent=s);
+      document.querySelectorAll(".reel").forEach(el=>el.classList.remove("rolling"));
+      const out=evaluate(reels,bet,mode); balance+=out.payout; returned+=out.payout;
+      if(out.win)wins++;
+      const modeName={random:"Acak",win:"Menang paksa (demo)",lose:"Kalah paksa (demo)"}[mode];
+      history.unshift({id:spins+1,reels,bet,payout:out.payout,win:out.win,modeName});
+      spins++; if(history.length>30)history.pop();
+      $("result").textContent=out.win?out.label+" · hadiah +"+fmt(out.payout)+" kredit.":"Kalah demo · "+fmt(bet)+" kredit digunakan.";
+      $("result").className="result "+(out.win?"good":"bad");
+      busy=false;renderHistory();update();
+    }
+  },75);
+}
+function reset(){
+  if(busy)return;
+  balance=START_BALANCE;spins=wins=spent=returned=0;history.length=0;
+  ["🍒","🍋","⭐"].forEach((s,i)=>$("r"+i).textContent=s);
+  $("result").textContent="Simulasi direset. Saldo kembali ke 1.000 kredit.";
+  $("result").className="result";renderHistory();update();
+}
+document.querySelectorAll('input[name="mode"]').forEach(el=>el.addEventListener("change",updateMode));
+$("spin").addEventListener("click",spin);$("reset").addEventListener("click",reset);
+$("bet").addEventListener("change",update);
+$("setBalance").addEventListener("click",()=>{
+  if(busy)return;
+  const n=Number($("newBalance").value);
+  if(!Number.isFinite(n)||n<0||n>1000000){alert("Masukkan saldo antara 0 dan 1.000.000.");return;}
+  balance=Math.floor(n);update();
+  $("result").textContent="Saldo demo diubah menjadi "+fmt(balance)+" kredit.";
+  $("result").className="result";
+});
+updateMode();renderHistory();update();
+</script>
+</body>
+</html>
